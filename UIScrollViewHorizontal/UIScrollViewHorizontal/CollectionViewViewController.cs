@@ -9,10 +9,12 @@ using MonoTouch.UIKit;
 
 namespace UIScrollViewHorizontal
 {
+
+
     public class CollectionViewViewController : UICollectionViewController  
     {
+
         private static NSString animalCellId = new NSString("AnimalCell");
-        static NSString headerId = new NSString("Header");
 
         private List<IEntity> animals;
 
@@ -34,8 +36,8 @@ namespace UIScrollViewHorizontal
         {
             base.ViewDidLoad();
 
+            
             CollectionView.RegisterClassForCell(typeof (EntityCell), animalCellId);
-            CollectionView.RegisterClassForSupplementaryView(typeof(Header), UICollectionElementKindSection.Header, headerId);
  
         }
 
@@ -61,12 +63,7 @@ namespace UIScrollViewHorizontal
             return animalCell;
         }
 
-        public override UICollectionReusableView GetViewForSupplementaryElement(UICollectionView collectionView, NSString elementKind, NSIndexPath indexPath)
-        {
-            var headerView = (Header)collectionView.DequeueReusableSupplementaryView(elementKind, headerId, indexPath);
-            headerView.Text = "Supplementary View";
-            return headerView;
-        }
+
 
 
         public override void ItemHighlighted(UICollectionView collectionView, NSIndexPath indexPath)
@@ -104,31 +101,7 @@ namespace UIScrollViewHorizontal
         }
     }
 
-    public class Header : UICollectionReusableView
-    {
-        UILabel label;
 
-        public string Text
-        {
-            get
-            {
-                return label.Text;
-            }
-            set
-            {
-                label.Text = value;
-                SetNeedsDisplay();
-            }
-        }
-
-        [Export("initWithFrame:")]
-        public Header(System.Drawing.RectangleF frame)
-            : base(frame)
-        {
-            label = new UILabel() { Frame = new System.Drawing.RectangleF(0, 0, 300, 50), BackgroundColor = UIColor.Yellow };
-            AddSubview(label);
-        }
-    }
 
     public class EntityCell : UICollectionViewCell
     {
@@ -163,15 +136,16 @@ namespace UIScrollViewHorizontal
     public class LineLayout : UICollectionViewFlowLayout
     {
         public const float ITEM_SIZE = 70;
-        public const int ACTIVE_DISTANCE = 200;
+        public const int ACTIVE_DISTANCE = 70;
         public const float ZOOM_FACTOR = 0.3f;
 
         public LineLayout()
         {
             ItemSize = new SizeF(ITEM_SIZE, ITEM_SIZE);
             ScrollDirection = UICollectionViewScrollDirection.Horizontal;
-            SectionInset = new UIEdgeInsets(0, 0, 0, 0);
-            MinimumLineSpacing = 50.0f;
+            SectionInset = new UIEdgeInsets(200,0,200,0);
+            MinimumLineSpacing = 50f;
+            
         }
 
         public override bool ShouldInvalidateLayoutForBoundsChange(RectangleF newBounds)

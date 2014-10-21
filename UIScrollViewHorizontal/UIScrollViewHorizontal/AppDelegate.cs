@@ -34,12 +34,12 @@ namespace UIScrollViewHorizontal
             // Line Layout
             var lineLayout = new LineLayout()
             {
-                HeaderReferenceSize = new System.Drawing.SizeF(160, 100),
+                MinimumLineSpacing = 1f,
                 ScrollDirection = UICollectionViewScrollDirection.Horizontal
             };
 
             var controller = new CollectionViewViewController(lineLayout);
-            controller.CollectionView.ContentInset = new UIEdgeInsets(50,0,0,0);
+            controller.CollectionView.ContentInset = new UIEdgeInsets(0,0,0,0);
 
             
             
