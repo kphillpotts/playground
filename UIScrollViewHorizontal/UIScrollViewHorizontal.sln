@@ -1,0 +1,40 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.30723.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UIScrollViewHorizontal", "UIScrollViewHorizontal\UIScrollViewHorizontal.csproj", "{1433C52E-A341-47D0-AB0B-1CC0D3B99E1F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Ad-Hoc|iPhone = Ad-Hoc|iPhone
+		Ad-Hoc|iPhoneSimulator = Ad-Hoc|iPhoneSimulator
+		AppStore|iPhone = AppStore|iPhone
+		AppStore|iPhoneSimulator = AppStore|iPhoneSimulator
+		Debug|iPhone = Debug|iPhone
+		Debug|iPhoneSimulator = Debug|iPhoneSimulator
+		Release|iPhone = Release|iPhone
+		Release|iPhoneSimulator = Release|iPhoneSimulator
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1433C52E-A341-47D0-AB0B-1CC0D3B99E1F}.Ad-Hoc|iPhone.ActiveCfg = Ad-Hoc|iPhone
+		{1433C52E-A341-47D0-AB0B-1CC0D3B99E1F}.Ad-Hoc|iPhone.Build.0 = Ad-Hoc|iPhone
+		{1433C52E-A341-47D0-AB0B-1CC0D3B99E1F}.Ad-Hoc|iPhoneSimulator.ActiveCfg = Ad-Hoc|iPhoneSimulator
+		{1433C52E-A341-47D0-AB0B-1CC0D3B99E1F}.Ad-Hoc|iPhoneSimulator.Build.0 = Ad-Hoc|iPhoneSimulator
+		{1433C52E-A341-47D0-AB0B-1CC0D3B99E1F}.AppStore|iPhone.ActiveCfg = AppStore|iPhone
+		{1433C52E-A341-47D0-AB0B-1CC0D3B99E1F}.AppStore|iPhone.Build.0 = AppStore|iPhone
+		{1433C52E-A341-47D0-AB0B-1CC0D3B99E1F}.AppStore|iPhoneSimulator.ActiveCfg = AppStore|iPhoneSimulator
+		{1433C52E-A341-47D0-AB0B-1CC0D3B99E1F}.AppStore|iPhoneSimulator.Build.0 = AppStore|iPhoneSimulator
+		{1433C52E-A341-47D0-AB0B-1CC0D3B99E1F}.Debug|iPhone.ActiveCfg = Debug|iPhone
+		{1433C52E-A341-47D0-AB0B-1CC0D3B99E1F}.Debug|iPhone.Build.0 = Debug|iPhone
+		{1433C52E-A341-47D0-AB0B-1CC0D3B99E1F}.Debug|iPhoneSimulator.ActiveCfg = Debug|iPhoneSimulator
+		{1433C52E-A341-47D0-AB0B-1CC0D3B99E1F}.Debug|iPhoneSimulator.Build.0 = Debug|iPhoneSimulator
+		{1433C52E-A341-47D0-AB0B-1CC0D3B99E1F}.Release|iPhone.ActiveCfg = Release|iPhone
+		{1433C52E-A341-47D0-AB0B-1CC0D3B99E1F}.Release|iPhone.Build.0 = Release|iPhone
+		{1433C52E-A341-47D0-AB0B-1CC0D3B99E1F}.Release|iPhoneSimulator.ActiveCfg = Release|iPhoneSimulator
+		{1433C52E-A341-47D0-AB0B-1CC0D3B99E1F}.Release|iPhoneSimulator.Build.0 = Release|iPhoneSimulator
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
