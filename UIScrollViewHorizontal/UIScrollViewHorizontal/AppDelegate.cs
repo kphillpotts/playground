@@ -28,11 +28,22 @@ namespace UIScrollViewHorizontal
             // create a new window instance based on the screen size
             window = new UIWindow(UIScreen.MainScreen.Bounds);
 
+            //var controller = new ScrollLIstView();
 
-            // If you have defined a view, add it here:
-            // window.RootViewController  = navigationController;
-            var sv = new ScrollLIstView();
-            window.RootViewController = sv;
+
+            // Line Layout
+            var lineLayout = new LineLayout()
+            {
+                HeaderReferenceSize = new System.Drawing.SizeF(160, 100),
+                ScrollDirection = UICollectionViewScrollDirection.Horizontal
+            };
+
+            var controller = new CollectionViewViewController(lineLayout);
+            controller.CollectionView.ContentInset = new UIEdgeInsets(50,0,0,0);
+
+            
+            
+            window.RootViewController = controller;
 
             // make the window visible
             window.MakeKeyAndVisible();

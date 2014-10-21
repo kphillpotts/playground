@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Text;
+using MonoTouch.CoreGraphics;
 using MonoTouch.UIKit;
 
 namespace UIScrollViewHorizontal
@@ -9,23 +10,59 @@ namespace UIScrollViewHorizontal
     public class ScrollLIstView : UIViewController
     {
         private UIScrollView _scrollView;
-        private List<UIImageView> _images;
+        private List<UIImageView> _visibleThumbnails;
         private UIImageView _preview;
         private UILabel _debugLabel;
-        private List<Entry> _entries;
+        private List<ListElement> _entries;
+
+        
+
+
 
         // Thumbnail sizes
         private static readonly SizeF ThumbnailSize = new SizeF(53.0f, 73.0f);
 
         public ScrollLIstView()
         {
-            _images = new List<UIImageView>();
-            _entries = new List<Entry>();
+            _visibleThumbnails = new List<UIImageView>();
+            _entries = new List<ListElement>();
         }
+
+        private float PlaceNewThumbnailOnRight(float position, ListElement listElement)
+        {
+            var newImageView = new UIImageView();
+            newImageView.Frame = new RectangleF(position, 0, ThumbnailSize.Width, ThumbnailSize.Height);
+            newImageView.Image = listElement.GetThumbnailImage();
+            
+            _visibleThumbnails.Add(newImageView);
+
+            return newImageView.Frame.GetMaxX();
+        }
+
+        private float PlaceNewThumbnailOnLeft(float position, ListElement listElement)
+        {
+            var newImageView = new UIImageView();
+            newImageView.Frame = new RectangleF(position-ThumbnailSize.Width, 0, ThumbnailSize.Width, ThumbnailSize.Height);
+            newImageView.Image = listElement.GetThumbnailImage();
+            
+            _visibleThumbnails.Insert(0, newImageView);
+
+            return newImageView.Frame.GetMinX();
+        }
+
+
+
+
+
+
 
         public override void ViewDidLoad()
         {
             base.ViewDidLoad();
+
+            // how many thumbnails wide is the screen
+            var thumbnailCount = View.Bounds.Width/ThumbnailSize.Width;
+
 
             View.BackgroundColor = UIColor.Red;
             //float w = 80.0f;
@@ -47,7 +84,7 @@ namespace UIScrollViewHorizontal
             {
                 int step = i % 12;
 
-                var entry = new Entry
+                var entry = new ListElement
                               {
                                   Index = i,
                                   PreviewImage = "run" + step + ".jpg",
@@ -57,7 +94,7 @@ namespace UIScrollViewHorizontal
                 var thumbImageView = new UIImageView(UIImage.FromFile(entry.ThumbImage));
                 thumbImageView.Frame = new RectangleF(padding * (i + 1) + (i * ThumbnailSize.Width), padding, ThumbnailSize.Width, ThumbnailSize.Height);
                 _scrollView.AddSubview(thumbImageView);
-                _images.Add(thumbImageView);
+                _visibleThumbnails.Add(thumbImageView);
                 _entries.Add(entry);
             }
 
@@ -68,6 +105,7 @@ namespace UIScrollViewHorizontal
 
             _preview = new UIImageView(new RectangleF(new PointF(0, 0), new SizeF(View.Bounds.Width, View.Bounds.Height - height)));
             View.AddSubview(_preview);
+            _scrollView.ShowsHorizontalScrollIndicator = false;
 
             var scrollDelegate = new ScrollDelegate(ThumbnailSize.Width, View.Bounds.Width);
             scrollDelegate.ScrollImageChanged += ScrollImageChanged;
@@ -80,7 +118,7 @@ namespace UIScrollViewHorizontal
         {
             _debugLabel.Text = "Index " + info.ImageIndex + " Offset " + info.ScrollOffset;
 
-            if ((info.ImageIndex >= 0) && (info.ImageIndex <= _images.Count - 1))
+            if ((info.ImageIndex >= 0) && (info.ImageIndex <= _visibleThumbnails.Count - 1))
             {
                 _preview.Image = UIImage.FromFile(_entries[info.ImageIndex].PreviewImage);
             }
@@ -90,11 +128,23 @@ namespace UIScrollViewHorizontal
 
     }
 
-    class Entry
+    class ListElement
     {
         public int Index { get; set; }
         public string ThumbImage { get; set; }
         public string PreviewImage { get; set; }
+        public float LogicalXPos { get; set; }
+
+
+        public UIImage GetThumbnailImage()
+        {
+            return UIImage.FromFile(ThumbImage);
+        }
+
+        public UIImage GetPreviewImage()
+        {
+            return UIImage.FromFile(PreviewImage);
+        }
     }
 
     class ScrollInfo
@@ -105,7 +155,6 @@ namespace UIScrollViewHorizontal
 
     class ScrollDelegate : UIScrollViewDelegate
     {
-
         public event Action<ScrollInfo> ScrollImageChanged;
 
         protected virtual void OnScrollImageChanged(ScrollInfo scrollInfo)
