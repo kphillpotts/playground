@@ -9,40 +9,35 @@ namespace UIScrollViewHorizontal
     public class ScrollLIstView : UIViewController
     {
         private UIScrollView _scrollView;
-        private List<UIButton> _buttons;
         private List<UIImageView> _images;
-        private float _thumbWidth = 53.0f;
         private UIImageView _preview;
         private UILabel _debugLabel;
-
         private List<Entry> _entries;
+
+        // Thumbnail sizes
+        private static readonly SizeF ThumbnailSize = new SizeF(53.0f, 73.0f);
 
         public ScrollLIstView()
         {
-            _buttons = new List<UIButton>();
             _images = new List<UIImageView>();
             _entries = new List<Entry>();
-
         }
+
         public override void ViewDidLoad()
         {
             base.ViewDidLoad();
 
             View.BackgroundColor = UIColor.Red;
-            float h = 73.0f;
             //float w = 80.0f;
             float padding = 0.0f;
             int n = 100;
 
-            var height = h + 2 * padding;
+            var height = ThumbnailSize.Height + 2 * padding;
 
             _scrollView = new UIScrollView
             {
-
                 Frame = new RectangleF(0, View.Bounds.Height - height, View.Frame.Width, height),
-
-                //Frame = new RectangleF(0, 0, View.Frame.Width, h + 2 * padding),
-                ContentSize = new SizeF((_thumbWidth + padding) * n, h),
+                ContentSize = new SizeF((ThumbnailSize.Width + padding) * n, ThumbnailSize.Height),
                 BackgroundColor = UIColor.DarkGray,
                 AutoresizingMask = UIViewAutoresizing.FlexibleWidth,
                 ContentInset = new UIEdgeInsets(0, View.Bounds.Width / 2, 0, View.Bounds.Width / 2)
@@ -52,25 +47,18 @@ namespace UIScrollViewHorizontal
             {
                 int step = i % 12;
 
-                Entry entry = new Entry();
-                entry.Index = i;
-                entry.PreviewImage = "run" + step + ".jpg";
-                entry.ThumbImage = "RunThumb" + step + ".jpg";
+                var entry = new Entry
+                              {
+                                  Index = i,
+                                  PreviewImage = "run" + step + ".jpg",
+                                  ThumbImage = "RunThumb" + step + ".jpg"
+                              };
 
-                //var image = UIImage.FromFile("site.jpg");
-                var iv = new UIImageView(UIImage.FromFile(entry.ThumbImage));
-
-                iv.Frame = new RectangleF(padding * (i + 1) + (i * _thumbWidth), padding, _thumbWidth, h);
-                _scrollView.AddSubview(iv);
-                _images.Add(iv);
+                var thumbImageView = new UIImageView(UIImage.FromFile(entry.ThumbImage));
+                thumbImageView.Frame = new RectangleF(padding * (i + 1) + (i * ThumbnailSize.Width), padding, ThumbnailSize.Width, ThumbnailSize.Height);
+                _scrollView.AddSubview(thumbImageView);
+                _images.Add(thumbImageView);
                 _entries.Add(entry);
-
-                //var button = UIButton.FromType(UIButtonType.RoundedRect);
-                //button.SetTitle(i.ToString(), UIControlState.Normal);
-                //button.Frame = new RectangleF(padding * (i + 1) + (i * w),
-                //        padding, w, h);
-                //_scrollView.AddSubview(button);
-                //_buttons.Add(button);
             }
 
             _debugLabel = new UILabel(new RectangleF(0, 20, View.Bounds.Width, 20));
@@ -81,15 +69,14 @@ namespace UIScrollViewHorizontal
             _preview = new UIImageView(new RectangleF(new PointF(0, 0), new SizeF(View.Bounds.Width, View.Bounds.Height - height)));
             View.AddSubview(_preview);
 
-            var sd = new ScrollDelegate(_thumbWidth, View.Bounds.Width);
-            sd.ScrollImageChanged += sd_ScrollImageChanged;
-
-            _scrollView.Delegate = sd;
+            var scrollDelegate = new ScrollDelegate(ThumbnailSize.Width, View.Bounds.Width);
+            scrollDelegate.ScrollImageChanged += ScrollImageChanged;
+            _scrollView.Delegate = scrollDelegate;
 
             View.AddSubview(_scrollView);
         }
 
-        void sd_ScrollImageChanged(ScrollInfo info)
+        void ScrollImageChanged(ScrollInfo info)
         {
             _debugLabel.Text = "Index " + info.ImageIndex + " Offset " + info.ScrollOffset;
 
@@ -134,7 +121,6 @@ namespace UIScrollViewHorizontal
         {
             _thumbWidth = thumbWidth;
             _width = width;
-
         }
 
         public override void Scrolled(UIScrollView scrollView)
@@ -147,18 +133,7 @@ namespace UIScrollViewHorizontal
 
             var index = Math.Floor(off.X / _thumbWidth);
 
-
-
-
             OnScrollImageChanged(new ScrollInfo() { ImageIndex = (int)index, ScrollOffset = (int)off.X });
-
-
-            //  Debug.WriteLine("index " + Math.Floor(index));
-
-            //if (off.X > (size.Width - 500))
-            //{
-            //    Debug.WriteLine("TimeToLoad");
-            //}
 
         }
     }
