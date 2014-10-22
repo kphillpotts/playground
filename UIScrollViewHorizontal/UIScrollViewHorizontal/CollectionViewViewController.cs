@@ -143,7 +143,7 @@ namespace UIScrollViewHorizontal
         {
             ItemSize = new SizeF(ITEM_SIZE, ITEM_SIZE);
             ScrollDirection = UICollectionViewScrollDirection.Horizontal;
-            SectionInset = new UIEdgeInsets(200,0,200,0);
+            SectionInset = new UIEdgeInsets(0,0,0,0);
             MinimumLineSpacing = 50f;
             
         }

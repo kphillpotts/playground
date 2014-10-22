@@ -15,10 +15,6 @@ namespace UIScrollViewHorizontal
         private UILabel _debugLabel;
         private List<ListElement> _entries;
 
-        
-
-
-
         // Thumbnail sizes
         private static readonly SizeF ThumbnailSize = new SizeF(53.0f, 73.0f);
 
@@ -51,6 +47,12 @@ namespace UIScrollViewHorizontal
         }
 
 
+        private int ScrollOffsetToIndex(float scrollOffset)
+        {
+            var index = scrollOffset/ThumbnailSize.Width;
+            if (index < 0) return 0;
+            return (int) index;
+        }
 
 
 
@@ -116,7 +118,9 @@ namespace UIScrollViewHorizontal
 
         void ScrollImageChanged(ScrollInfo info)
         {
-            _debugLabel.Text = "Index " + info.ImageIndex + " Offset " + info.ScrollOffset;
+            var calcIndex = ScrollOffsetToIndex(info.ScrollOffset);
+
+            _debugLabel.Text = "Index " + info.ImageIndex + " Offset " + info.ScrollOffset + " CalcOffset " + calcIndex;
 
             if ((info.ImageIndex >= 0) && (info.ImageIndex <= _visibleThumbnails.Count - 1))
             {

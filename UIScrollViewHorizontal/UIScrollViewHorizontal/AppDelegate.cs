@@ -30,16 +30,19 @@ namespace UIScrollViewHorizontal
 
             //var controller = new ScrollLIstView();
 
+            var controller = new CollectionViewSample();
 
-            // Line Layout
-            var lineLayout = new LineLayout()
-            {
-                MinimumLineSpacing = 1f,
-                ScrollDirection = UICollectionViewScrollDirection.Horizontal
-            };
 
-            var controller = new CollectionViewViewController(lineLayout);
-            controller.CollectionView.ContentInset = new UIEdgeInsets(0,0,0,0);
+
+            //// Line Layout
+            //var lineLayout = new LineLayout()
+            //{
+            //    MinimumLineSpacing = 1f,
+            //    ScrollDirection = UICollectionViewScrollDirection.Horizontal
+            //};
+
+            //var controller = new CollectionViewViewController(lineLayout);
+            //controller.CollectionView.ContentInset = new UIEdgeInsets(0,0,0,0);
 
             
             
