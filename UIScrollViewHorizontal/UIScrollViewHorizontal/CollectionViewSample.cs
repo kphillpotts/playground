@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Globalization;
+using System.Runtime.InteropServices;
+using System.Threading;
 using MonoTouch.Foundation;
 using MonoTouch.UIKit;
 
@@ -12,7 +14,9 @@ namespace UIScrollViewHorizontal
         private UICollectionView _collectionViewUser;
         private UIImageView _preview;
         private UserSource _userSource;
+        private UIButton _animateButton;
         private const int MaxElementsToAdd = 500;
+        private System.Timers.Timer t = new System.Timers.Timer();
 
         public override void ViewDidLoad()
         {
@@ -50,34 +54,40 @@ namespace UIScrollViewHorizontal
             _userSource.ScrollImageChanged += UserSourceScrollImageChanged;
             _userSource.LoadMoreRequest += UserSourceLoadMoreRequest;
 
-            _preview = new UIImageView(new RectangleF(new PointF(0, 50), new SizeF(View.Bounds.Width, View.Bounds.Height - (75 + 50))));
+            _preview = new UIImageView(new RectangleF(new PointF(0, 60), new SizeF(View.Bounds.Width, View.Bounds.Height - (75 + 60))));
             _preview.ContentMode = UIViewContentMode.ScaleAspectFit;
             View.AddSubview(_preview);
 
             UIButton first = UIButton.FromType(UIButtonType.System);
-            first.SetTitle("first", UIControlState.Normal);
-            first.BackgroundColor = UIColor.LightGray;
-            first.Frame = new RectangleF(new PointF(0, 20), new SizeF(50, 30));
+            first.SetTitle("rewind", UIControlState.Normal);
+            first.BackgroundColor = UIColor.White;
+            first.Frame = new RectangleF(new PointF(0, 20), new SizeF(100, 40));
             first.TouchUpInside += FirstTouchUpInside;
             View.AddSubview(first);
 
-            UIButton last = UIButton.FromType(UIButtonType.System);
-            last.SetTitle("last", UIControlState.Normal);
-            last.BackgroundColor = UIColor.LightGray;
-            last.Frame = new RectangleF(new PointF(View.Bounds.Width - 50, 20), new SizeF(50, 30));
-            last.TouchUpInside += LastTouchUpInside;
-            View.AddSubview(last);
+            _animateButton = UIButton.FromType(UIButtonType.System);
+            _animateButton.SetTitle("Animate", UIControlState.Normal);
+            _animateButton.BackgroundColor = UIColor.White;
+            _animateButton.Frame = new RectangleF(new PointF(View.Bounds.Width - 100, 20), new SizeF(100, 40));
+            _animateButton.TouchUpInside += LastTouchUpInside;
+            View.AddSubview(_animateButton);
+
 
             // preload with some data 
             for (int i = 0; i < 12; i++)
             {
+                var elementIndex = _userSource.Rows.Count;
                 _userSource.Rows.Add(new UserElement(
-                    title: i.ToString(CultureInfo.InvariantCulture),
-                    thumbImageSource: "RunThumb" + i % 12 + ".jpg",
-                    previewImageSource: "run" + i % 12 + ".jpg",
-                    tapped: null));
+                    title: elementIndex.ToString(CultureInfo.InvariantCulture),
+                    thumbImageSource: "RunThumb" + elementIndex % 12 + ".jpg",
+                    previewImageSource: "run" + elementIndex % 12 + ".jpg",
+                    tapped: () => ElementTapped(elementIndex)));
             }
             _collectionViewUser.ReloadData();
+
+            t.Elapsed += t_Elapsed;
+            t.Interval = 10;
+
         }
 
         private void UserSourceLoadMoreRequest()
@@ -96,11 +106,12 @@ namespace UIScrollViewHorizontal
 
         private void AddImageToCollection(int imageIndex)
         {
+            var elementIndex = _userSource.Rows.Count;
             _userSource.Rows.Add(new UserElement(
-                title: _userSource.Rows.Count.ToString(CultureInfo.InvariantCulture), 
+                title: elementIndex.ToString(CultureInfo.InvariantCulture), 
                 thumbImageSource: "RunThumb" + imageIndex + ".jpg", 
-                previewImageSource: "run" + imageIndex + ".jpg", 
-                tapped: null));
+                previewImageSource: "run" + imageIndex + ".jpg",
+                tapped: () => ElementTapped(elementIndex)));
 
             var collectionIndex = _userSource.Rows.Count <= 0 ? 0 : _userSource.Rows.Count - 1;
 
@@ -114,20 +125,43 @@ namespace UIScrollViewHorizontal
 
         private void LastTouchUpInside(object sender, EventArgs e)
         {
-            _collectionViewUser.SetContentOffset(
-                new PointF(_collectionViewUser.ContentSize.Width + _collectionViewUser.ContentInset.Right, 0), true);
+            if (t.Enabled)
+            {
+                _animateButton.SetTitle("Animate", UIControlState.Normal);
+                t.Stop();
+            }
+            else
+            {
+                _animateButton.SetTitle("Stop", UIControlState.Normal);
+                t.Start();
+            }
         }
-
 
         private void UserSourceScrollImageChanged(int obj)
         {
             _preview.Image = _userSource.Rows[obj].PreviewImage;
         }
 
-
-        private void ElementTapped(String title)
+        void t_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
-            new UIAlertView("Tapped", title, null, "OK", null).Show();
+            InvokeOnMainThread(delegate
+                               {
+                                   var offset = _collectionViewUser.ContentOffset;
+                                   var max = _collectionViewUser.ContentSize;
+
+                                   if (offset.X < max.Width)
+                                       _collectionViewUser.SetContentOffset(new PointF(offset.X + 5.3f, 0), false);
+                                   else
+                                   {
+                                       t.Stop();
+
+                                   }
+                               });
+        }
+
+        private void ElementTapped(int userElementId)
+        {
+            _preview.Image = _userSource.Rows[userElementId].PreviewImage;
         }
     }
 
@@ -212,14 +246,18 @@ namespace UIScrollViewHorizontal
             cell.ImageView.Alpha = 0.5f;
         }
 
+        public override void ItemSelected(UICollectionView collectionView, NSIndexPath indexPath)
+        {
+            UserElement row = Rows[indexPath.Row];
+            if (row.Tapped != null)
+                row.Tapped.Invoke();
+        }
+
         public override void ItemUnhighlighted(UICollectionView collectionView, NSIndexPath indexPath)
         {
             var cell = (UserCell) collectionView.CellForItem(indexPath);
             cell.ImageView.Alpha = 1;
 
-            UserElement row = Rows[indexPath.Row];
-            if (row.Tapped != null)
-                row.Tapped.Invoke();
         }
 
         public override UICollectionViewCell GetCell(UICollectionView collectionView, NSIndexPath indexPath)
