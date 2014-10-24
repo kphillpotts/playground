@@ -1,4 +1,4 @@
-#playground
+#Playground
 
 This is just a playground for my personal codes and bits.  Mostly it'll be Xamarin proof of concept projects.
 
