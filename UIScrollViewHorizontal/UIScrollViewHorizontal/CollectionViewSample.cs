@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Globalization;
 using MonoTouch.Foundation;
 using MonoTouch.UIKit;
 
@@ -11,7 +12,7 @@ namespace UIScrollViewHorizontal
         private UICollectionView _collectionViewUser;
         private UIImageView _preview;
         private UserSource _userSource;
-
+        private const int MaxElementsToAdd = 500;
 
         public override void ViewDidLoad()
         {
@@ -38,7 +39,6 @@ namespace UIScrollViewHorizontal
             _collectionViewUser.BackgroundColor = UIColor.White;
             View.AddSubview(_collectionViewUser);
 
-
             _userSource = new UserSource();
             _userSource.ImageViewSize = new SizeF(53.0f, 73.0f);
 
@@ -49,9 +49,8 @@ namespace UIScrollViewHorizontal
             _collectionViewUser.Source = _userSource;
             _userSource.ScrollImageChanged += UserSourceScrollImageChanged;
             _userSource.LoadMoreRequest += UserSourceLoadMoreRequest;
-            _preview = new UIImageView(
-                new RectangleF(new PointF(0, 50),
-                new SizeF(View.Bounds.Width, View.Bounds.Height - (75 + 50))));
+
+            _preview = new UIImageView(new RectangleF(new PointF(0, 50), new SizeF(View.Bounds.Width, View.Bounds.Height - (75 + 50))));
             _preview.ContentMode = UIViewContentMode.ScaleAspectFit;
             View.AddSubview(_preview);
 
@@ -72,20 +71,40 @@ namespace UIScrollViewHorizontal
             // preload with some data 
             for (int i = 0; i < 12; i++)
             {
-                _userSource.Rows.Add(new UserElement(i.ToString(), "RunThumb" + i%12 + ".jpg", "run" + i%12 + ".jpg", null));
+                _userSource.Rows.Add(new UserElement(
+                    title: i.ToString(CultureInfo.InvariantCulture),
+                    thumbImageSource: "RunThumb" + i % 12 + ".jpg",
+                    previewImageSource: "run" + i % 12 + ".jpg",
+                    tapped: null));
             }
-
             _collectionViewUser.ReloadData();
         }
 
         private void UserSourceLoadMoreRequest()
         {
-            for (int i = 0; i < 12; i++)
+            // only add up to the maximum number we have specified.
+            // technically our only limitation is the number of 
+            // UserSource rows we want to hold.  The actual UI controls
+            if (_userSource.Rows.Count >= MaxElementsToAdd)
+                return;
+
+            for (var i = 0; i < 12; i++)
             {
-                _userSource.Rows.Add(new UserElement(_userSource.Rows.Count.ToString(), "RunThumb" + i%12 + ".jpg",
-                    "run" + i%12 + ".jpg", null));
-                _collectionViewUser.InsertItems(new[] {NSIndexPath.FromItemSection(_userSource.Rows.Count - 1, 0)});
+                AddImageToCollection(i%12);
             }
+        }
+
+        private void AddImageToCollection(int imageIndex)
+        {
+            _userSource.Rows.Add(new UserElement(
+                title: _userSource.Rows.Count.ToString(CultureInfo.InvariantCulture), 
+                thumbImageSource: "RunThumb" + imageIndex + ".jpg", 
+                previewImageSource: "run" + imageIndex + ".jpg", 
+                tapped: null));
+
+            var collectionIndex = _userSource.Rows.Count <= 0 ? 0 : _userSource.Rows.Count - 1;
+
+            _collectionViewUser.InsertItems(new[] { NSIndexPath.FromItemSection(item: collectionIndex, section: 0) });
         }
 
         private void FirstTouchUpInside(object sender, EventArgs e)
@@ -199,7 +218,8 @@ namespace UIScrollViewHorizontal
             cell.ImageView.Alpha = 1;
 
             UserElement row = Rows[indexPath.Row];
-            row.Tapped.Invoke();
+            if (row.Tapped != null)
+                row.Tapped.Invoke();
         }
 
         public override UICollectionViewCell GetCell(UICollectionView collectionView, NSIndexPath indexPath)
